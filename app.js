@@ -852,6 +852,144 @@ function simplifyGeneralParagraph(text, gradeNum) {
  * 4. ### Simple example (everyday relatable analogy)
  * 5. ### Remember this (1-3 key take-home points)
  */
+
+// ============================================================================
+// Browser Language Model: Transformers.js + FLAN-T5
+// ============================================================================
+// This model runs in the browser. The first use requires an internet connection
+// to download the model. The loaded pipeline is reused for later clicks.
+let localSimplifierPromise = null;
+let localModelStatus = "not-loaded";
+
+async function loadLocalSimplifier() {
+  if (!localSimplifierPromise) {
+    localModelStatus = "loading";
+    localSimplifierPromise = import("https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/+esm")
+      .then(({ pipeline }) => pipeline("text2text-generation", "Xenova/flan-t5-small"))
+      .then(model => {
+        localModelStatus = "ready";
+        return model;
+      })
+      .catch(error => {
+        localModelStatus = "failed";
+        localSimplifierPromise = null;
+        throw error;
+      });
+  }
+  return localSimplifierPromise;
+}
+
+function normalizeForSimilarity(text) {
+  return tokenizeWords(String(text || "").toLowerCase())
+    .filter(word => !STOP_WORDS_SET.has(word))
+    .join(" ");
+}
+
+function wordSimilarity(original, rewritten) {
+  const originalWords = new Set(normalizeForSimilarity(original).split(/\s+/).filter(Boolean));
+  const rewrittenWords = new Set(normalizeForSimilarity(rewritten).split(/\s+/).filter(Boolean));
+  if (!originalWords.size || !rewrittenWords.size) return 0;
+  let overlap = 0;
+  originalWords.forEach(word => {
+    if (rewrittenWords.has(word)) overlap++;
+  });
+  return overlap / Math.max(originalWords.size, rewrittenWords.size);
+}
+
+function removeModelInstructionArtifacts(text) {
+  return String(text || "")
+    .replace(/^\s*(answer|response|simplified explanation)\s*:\s*/i, "")
+    .replace(/^\s*in simple words\s*:\s*/i, "")
+    .replace(/^\s*```[a-z]*\s*/i, "")
+    .replace(/\s*```\s*$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildLearningSections(simpleText, originalText, grade) {
+  const cleanedSimple = removeModelInstructionArtifacts(simpleText);
+  const sentences = tokenizeSentences(cleanedSimple);
+  const steps = sentences.slice(0, 6).map((sentence, index) => `${index + 1}. ${sentence}`);
+  const wordTokens = tokenizeWords(originalText);
+  const importantTerms = [];
+  const lowerOriginal = originalText.toLowerCase();
+
+  Object.entries(DIFFICULT_WORDS_DICT).forEach(([term, meaning]) => {
+    if (lowerOriginal.includes(term.toLowerCase()) && importantTerms.length < 8) {
+      importantTerms.push(`- ${term}: ${meaning}.`);
+    }
+  });
+
+  if (!importantTerms.length) {
+    const candidateWords = [...new Set(wordTokens.map(w => w.toLowerCase()))]
+      .filter(w => w.length > 7 && !STOP_WORDS_SET.has(w))
+      .slice(0, 5);
+    candidateWords.forEach(word => {
+      importantTerms.push(`- ${word}: an important word in this paragraph.`);
+    });
+  }
+
+  const topic = wordTokens
+    .map(word => word.toLowerCase())
+    .find(word => word.length > 6 && !STOP_WORDS_SET.has(word)) || "this topic";
+
+  const example = `A simple way to think about ${topic} is to imagine a step-by-step process where each step helps produce the final result.`;
+  const remember = sentences.slice(0, 2).map(sentence => `- ${sentence.replace(/[.!?]$/, "")}`);
+
+  return [
+    "### In simple words",
+    cleanedSimple,
+    "",
+    "### How it works",
+    ...(steps.length ? steps : ["1. The paragraph introduces an important idea.", "2. It explains details about that idea."]),
+    "",
+    "### Important words",
+    ...(importantTerms.length ? importantTerms : ["- No special terms were detected."]),
+    "",
+    "### Simple example",
+    example,
+    "",
+    "### Remember this",
+    ...(remember.length ? remember : ["- Focus on the main idea and the important steps."])
+  ].join("\n");
+}
+
+async function generateBrowserSimplification(originalText, grade, subject) {
+  const model = await loadLocalSimplifier();
+  const basePrompt = `Simplify this educational paragraph for a ${grade} student studying ${subject}. Use easy words and short sentences. Explain the main idea so the student can learn it. Keep all important facts. Do not copy the original sentences. Do not add facts. Return only the rewritten explanation, with no title and no bullet points.\n\nParagraph:\n${originalText}`;
+  const result = await model(basePrompt, {
+    max_new_tokens: 260,
+    do_sample: false
+  });
+  let generated = removeModelInstructionArtifacts(result?.[0]?.generated_text || "");
+
+  if (!generated || wordSimilarity(originalText, generated) > 0.62) {
+    const retryPrompt = `Rewrite the paragraph below for a ${grade} student. The previous answer was too similar. Use completely different wording, shorter sentences, and simple explanations. Do not copy any sentence from the paragraph. Return only the new explanation.\n\nParagraph:\n${originalText}`;
+    const retryResult = await model(retryPrompt, {
+      max_new_tokens: 300,
+      do_sample: false
+    });
+    generated = removeModelInstructionArtifacts(retryResult?.[0]?.generated_text || "");
+  }
+
+  if (!generated || wordSimilarity(originalText, generated) > 0.72) {
+    throw new Error("The browser model returned an explanation that was too similar to the original.");
+  }
+
+  return buildLearningSections(generated, originalText, grade);
+}
+
+async function createBestSimplification(originalText, grade, subject, isExtraSimple = false) {
+  try {
+    const explanation = await generateBrowserSimplification(originalText, grade, subject);
+    return { text: explanation, mode: "Browser AI + NLP" };
+  } catch (error) {
+    console.warn("Local browser model unavailable. Using rule-based fallback.", error);
+    const fallback = simplifyText(originalText, grade, isExtraSimple);
+    return { text: fallback, mode: "Rule-Based NLP Fallback" };
+  }
+}
+
 function simplifyText(text, arg2, arg3, arg4) {
   const cleaned = cleanInputText(text);
   if (!cleaned) return "";
@@ -1446,7 +1584,7 @@ function loadSampleText() {
 /**
  * Main Analysis Orchestration
  */
-function runAnalysis() {
+async function runAnalysis() {
   const text = elements.inputText.value.trim();
   const grade = elements.gradeSelect.value;
   const subject = elements.subjectSelect.value;
@@ -1501,7 +1639,18 @@ function runAnalysis() {
   const summaryResults = generateExtractiveSummary(sentences, keywordResults.keywords);
   const difficultWords = detectDifficultWords(preprocessed.cleaned, words);
   const readability = calculateReadability(sentences, words, grade);
-  const simplifiedText = simplifyText(preprocessed.cleaned, sentences, grade, state.isExtraSimple);
+  let simplifiedResult;
+  try {
+    showToast("Preparing a simple explanation. The first model load may take a moment.", "info");
+    simplifiedResult = await createBestSimplification(preprocessed.cleaned, grade, subject, state.isExtraSimple);
+  } catch (error) {
+    showToast("The explanation model could not be loaded. Using the local NLP fallback.", "error");
+    simplifiedResult = {
+      text: simplifyText(preprocessed.cleaned, grade, state.isExtraSimple),
+      mode: "Rule-Based NLP Fallback"
+    };
+  }
+  const simplifiedText = simplifiedResult.text;
   const questions = generatePracticeQuestions(preprocessed.cleaned, sentences, keywordResults.keywords, subject);
 
   // Store Analysis State
@@ -1523,6 +1672,7 @@ function runAnalysis() {
     difficultWords,
     readability,
     simplifiedText,
+    simplificationMode: simplifiedResult.mode,
     questions,
     grade,
     subject
@@ -1546,7 +1696,7 @@ function renderResults() {
 
   // 1. Toolbar & Badges
   elements.badgeGradeSubject.textContent = `${data.grade} • ${data.subject}`;
-  elements.simplificationModeBadge.textContent = state.isExtraSimple ? "Extra Simple (Rule-Based)" : "Rule-Based NLP";
+  elements.simplificationModeBadge.textContent = data.simplificationMode || (state.isExtraSimple ? "Extra Simple (Rule-Based)" : "Rule-Based NLP");
 
   // 2. Simple Explanation Card
   elements.outputSimplifiedText.innerHTML = formatSimplifiedHtml(data.simplifiedText);
@@ -1891,19 +2041,30 @@ Generated by TextSimplify (100% In-Browser NLP)
 /**
  * Toggle "Make It Simpler" mode
  */
-function toggleSimplerExplanation() {
+async function toggleSimplerExplanation() {
   if (!state.analysisData) return;
   state.isExtraSimple = !state.isExtraSimple;
   
-  state.analysisData.simplifiedText = simplifyText(
-    state.analysisData.cleanedText,
-    state.analysisData.sentences,
-    state.analysisData.grade,
-    state.isExtraSimple
-  );
+  try {
+    const result = await createBestSimplification(
+      state.analysisData.cleanedText,
+      state.analysisData.grade,
+      state.analysisData.subject,
+      state.isExtraSimple
+    );
+    state.analysisData.simplifiedText = result.text;
+    state.analysisData.simplificationMode = result.mode;
+  } catch (error) {
+    state.analysisData.simplifiedText = simplifyText(
+      state.analysisData.cleanedText,
+      state.analysisData.grade,
+      state.isExtraSimple
+    );
+    state.analysisData.simplificationMode = "Rule-Based NLP Fallback";
+  }
 
   elements.outputSimplifiedText.innerHTML = formatSimplifiedHtml(state.analysisData.simplifiedText);
-  elements.simplificationModeBadge.textContent = state.isExtraSimple ? "Extra Simple (Aggressive)" : "Rule-Based NLP";
+  elements.simplificationModeBadge.textContent = state.analysisData.simplificationMode;
 
   if (state.isExtraSimple) {
     elements.btnSimpler.innerHTML = `
@@ -1979,21 +2140,40 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Action Buttons
-  elements.btnAnalyze.addEventListener("click", runAnalysis);
+  elements.btnAnalyze.addEventListener("click", async () => {
+    elements.btnAnalyze.disabled = true;
+    try {
+      await runAnalysis();
+    } finally {
+      elements.btnAnalyze.disabled = false;
+    }
+  });
   elements.btnClearInput.addEventListener("click", clearInput);
   elements.btnLoadSample.addEventListener("click", loadSampleText);
-  elements.btnQuickSample.addEventListener("click", () => {
+  elements.btnQuickSample.addEventListener("click", async () => {
     loadSampleText();
-    runAnalysis();
+    elements.btnQuickSample.disabled = true;
+    try {
+      await runAnalysis();
+    } finally {
+      elements.btnQuickSample.disabled = false;
+    }
   });
 
   // Results Toolbar Buttons
-  elements.btnSimpler.addEventListener("click", toggleSimplerExplanation);
+  elements.btnSimpler.addEventListener("click", async () => {
+    elements.btnSimpler.disabled = true;
+    try {
+      await toggleSimplerExplanation();
+    } finally {
+      elements.btnSimpler.disabled = false;
+    }
+  });
   elements.btnCopy.addEventListener("click", copyAnalysisResult);
   elements.btnDownload.addEventListener("click", downloadAnalysisTxt);
   elements.btnAnalyzeAgain.addEventListener("click", () => {
     elements.inputText.scrollIntoView({ behavior: "smooth" });
-    runAnalysis();
+    elements.btnAnalyze.click();
   });
   elements.btnClearResults.addEventListener("click", clearResults);
   elements.btnTogglePipeline.addEventListener("click", toggleAllPipelineSteps);
