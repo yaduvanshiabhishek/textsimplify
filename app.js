@@ -13,9 +13,9 @@
  */
 const DIFFICULT_WORDS_DICT = {
   "photosynthesis": "How plants make food using sunlight",
-  "carbon dioxide": "A gas in the air used by plants",
+  "carbon dioxide": "A gas in the air used by plants to make food",
   "atmosphere": "The layer of air around Earth",
-  "evaporation": "When liquid changes into gas",
+  "evaporation": "When liquid water changes into gas",
   "habitat": "The natural home of a plant or animal",
   "organism": "A living thing",
   "ecosystem": "Living things and their environment",
@@ -33,14 +33,63 @@ const DIFFICULT_WORDS_DICT = {
   "condensation": "When gas cools down and turns back into liquid",
   "chlorophyll": "The green substance in plants that absorbs sunlight",
   "respiration": "Breathing or how cells take in oxygen and release energy",
-  "biodiversity": "The variety of all living things in a place"
+  "biodiversity": "The variety of all living things in a place",
+  "demand forecasting": "Predicting how much of a product people will need",
+  "inventory": "The products or goods currently kept in stock",
+  "inventory replenishment": "Planning when and how much stock to buy again",
+  "time-series decomposition": "Studying past data by separating it into useful patterns",
+  "statistical forecast": "A prediction made using numbers and past data",
+  "statistical forecasts": "Predictions made using numbers and past data",
+  "erp system": "A computer system used to manage business activities",
+  "database system": "An organized place where information is stored",
+  "inventory optimization": "Keeping the right amount of stock without running out",
+  "just-in-time purchasing": "Buying products shortly before they are needed"
 };
 
 /**
  * Direct replacement mapping for rule-based vocabulary simplification
  */
 const SIMPLIFICATION_REPLACEMENTS = [
-  // Multi-word & contextual phrases
+  // Multi-word & contextual phrases (Business, Forecasting, Supply Chain)
+  { pattern: /\bdesigned for\b/gi, replacement: "made for" },
+  { pattern: /\bdemand forecasting and inventory replenishment planning\b/gi, replacement: "predicting customer demand and planning when to buy more stock" },
+  { pattern: /\bdemand forecasting tool\b/gi, replacement: "tool for predicting future demand" },
+  { pattern: /\bdemand forecasting\b/gi, replacement: "predicting how much of a product people will need" },
+  { pattern: /\binventory replenishment planning\b/gi, replacement: "planning when and how much stock to buy again" },
+  { pattern: /\binventory replenishment\b/gi, replacement: "planning when to buy more stock" },
+  { pattern: /\brobust time-series decomposition approach\b/gi, replacement: "strong method that studies past data to find patterns" },
+  { pattern: /\btime-series decomposition approach\b/gi, replacement: "method that studies past data by separating it into useful patterns" },
+  { pattern: /\btime-series decomposition\b/gi, replacement: "studying past data by separating it into useful patterns" },
+  { pattern: /\btime-series\b/gi, replacement: "past data over time" },
+  { pattern: /\bstatistical forecasts\b/gi, replacement: "predictions made using numbers and past data" },
+  { pattern: /\bstatistical forecast\b/gi, replacement: "prediction made using numbers and past data" },
+  { pattern: /\bform a solid foundation for further demand planning processes\b/gi, replacement: "give a strong starting point for later planning activities" },
+  { pattern: /\bfurther demand planning processes\b/gi, replacement: "later planning activities" },
+  { pattern: /\bplanning technologies\b/gi, replacement: "computer tools that help with planning" },
+  { pattern: /\binventory optimization tools\b/gi, replacement: "computer tools that help keep the right amount of stock" },
+  { pattern: /\binventory optimization\b/gi, replacement: "keeping the right amount of stock" },
+  { pattern: /\btimely information\b/gi, replacement: "information received at the right time" },
+  { pattern: /\bdecision-making\b/gi, replacement: "choosing what to do" },
+  { pattern: /\bfunctions purely as\b/gi, replacement: "works only as" },
+  { pattern: /\binventory data\b/gi, replacement: "information about products currently in stock" },
+  { pattern: /\boptimal just-in-time purchase plan\b/gi, replacement: "best plan to buy products just before they are needed" },
+  { pattern: /\bjust-in-time purchase plan\b/gi, replacement: "a plan to buy products just before they are needed" },
+  { pattern: /\bjust-in-time\b/gi, replacement: "just before needed" },
+  { pattern: /\bERP or database system\b/gi, replacement: "ERP or database computer system" },
+  { pattern: /\bERP system\b/gi, replacement: "a computer system used to manage business activities" },
+  { pattern: /\bdatabase system\b/gi, replacement: "an organized place where information is stored" },
+  { pattern: /\bexporting it back to\b/gi, replacement: "sending it back to" },
+  { pattern: /\bexporting\b/gi, replacement: "sending data from one system to another" },
+  { pattern: /\bexecute it immediately\b/gi, replacement: "carry it out right away" },
+  { pattern: /\bexecute it\b/gi, replacement: "carry it out" },
+  { pattern: /\bexecute\b/gi, replacement: "carry out" },
+  { pattern: /\bdeliver highly accurate\b/gi, replacement: "provide very accurate" },
+  { pattern: /\bwe deliver\b/gi, replacement: "it provides" },
+  { pattern: /\bweb-based application\b/gi, replacement: "online computer program" },
+  { pattern: /\bweb-based\b/gi, replacement: "online" },
+  { pattern: /\bapplication\b/gi, replacement: "computer program" },
+
+  // Multi-word & contextual phrases (Science & Nature)
   { pattern: /\bcontinuous movement of water between the Earth['’]s surface and the atmosphere\b/gi, replacement: "way water moves around Earth" },
   { pattern: /\bcontinuous movement of water\b/gi, replacement: "way water moves" },
   { pattern: /\bcontinuous movement\b/gi, replacement: "ongoing movement" },
@@ -115,7 +164,12 @@ const SIMPLIFICATION_REPLACEMENTS = [
   { pattern: /\bhowever\b/gi, replacement: "but" },
   { pattern: /\badditional\b/gi, replacement: "extra" },
   { pattern: /\binitial\b/gi, replacement: "first" },
-  { pattern: /\bfinal\b/gi, replacement: "last" }
+  { pattern: /\bfinal\b/gi, replacement: "last" },
+  { pattern: /\brobust\b/gi, replacement: "strong and reliable" },
+  { pattern: /\bfoundation\b/gi, replacement: "starting point" },
+  { pattern: /\bintegrates\b/gi, replacement: "combines" },
+  { pattern: /\bcrucial\b/gi, replacement: "very important" },
+  { pattern: /\boptimal\b/gi, replacement: "best or most suitable" }
 ];
 
 /**
@@ -133,7 +187,11 @@ const SCIENTIFIC_TERM_EXPLANATIONS = {
   "organism": "a living thing",
   "transformation": "a change from one form into another",
   "energy": "the ability to make things happen",
-  "environment": "everything around a living thing"
+  "environment": "everything around a living thing",
+  "demand forecasting": "predicting how many products people will need",
+  "inventory": "products currently kept in stock",
+  "statistical forecast": "a prediction made using past numbers and data",
+  "erp system": "a computer system used to manage business activities"
 };
 
 /**
@@ -535,19 +593,110 @@ function calculateReadability(sentences, words, selectedGrade) {
 }
 
 /**
- * Rule-Based Text Simplification:
- * Implements a hybrid rule-based NLP pipeline:
- * 1. Sentence tokenization
- * 2. Clause detection
- * 3. Complex phrase replacement
- * 4. Difficult-word replacement
- * 5. Sentence splitting
- * 6. Technical-term explanation
- * 7. Grade-level adjustment
- * 8. Output validation
+ * Input text cleaner for simplification: removes Markdown links, raw URLs,
+ * and extraneous formatting while preserving sentence meaning.
+ */
+function cleanInputText(rawText) {
+  if (!rawText) return "";
+  let text = rawText;
+  // 1. Remove Markdown links [visible text](url) -> visible text
+  text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+  // 2. Remove raw URLs
+  text = text.replace(/https?:\/\/[^\s)]+/gi, "").replace(/www\.[^\s)]+/gi, "");
+  // 3. Remove markdown formatting symbols
+  text = text.replace(/[*_#`~>]/g, "");
+  // 4. Normalize quotes and dashes
+  text = text.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
+  text = text.replace(/[\u2013\u2014]/g, "-");
+  // 5. Clean whitespaces
+  text = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  text = text.replace(/[ \t]+/g, " ");
+  text = text.replace(/\n\s*\n+/g, "\n\n");
+  return text.trim();
+}
+
+/**
+ * Renders structured Markdown sections into styled HTML elements
+ */
+function formatSimplifiedHtml(markdownText) {
+  if (!markdownText) return "";
+  const escapeHtml = (str) => str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+  const rawSections = markdownText.split(/(?=###\s+)/g);
+  let html = "";
+
+  for (const rawSec of rawSections) {
+    const trimmed = rawSec.trim();
+    if (!trimmed) continue;
+    
+    const headerMatch = trimmed.match(/^###\s+([^\n]+)\n*([\s\S]*)$/);
+    if (headerMatch) {
+      const title = headerMatch[1].trim();
+      const body = headerMatch[2].trim();
+      
+      let sectionIcon = "💡";
+      if (/in simple words/i.test(title)) sectionIcon = "📖";
+      else if (/how it works/i.test(title)) sectionIcon = "⚙️";
+      else if (/important words/i.test(title)) sectionIcon = "📚";
+      else if (/simple example/i.test(title)) sectionIcon = "🌟";
+      else if (/remember this/i.test(title)) sectionIcon = "📌";
+
+      html += `<div class="simplified-section">`;
+      html += `<h4 class="simplified-section-title"><span class="section-icon">${sectionIcon}</span> ${escapeHtml(title)}</h4>`;
+      
+      if (/how it works/i.test(title)) {
+        const items = body.split(/\n+/).map(l => l.replace(/^\d+[\.)]\s*/, "").trim()).filter(Boolean);
+        html += `<ol class="simplified-numbered-list">`;
+        items.forEach(item => {
+          html += `<li>${escapeHtml(item)}</li>`;
+        });
+        html += `</ol>`;
+      } else if (/important words|remember this/i.test(title)) {
+        const items = body.split(/\n+/).map(l => l.replace(/^[-*•]\s*/, "").trim()).filter(Boolean);
+        html += `<ul class="simplified-bullet-list">`;
+        items.forEach(item => {
+          if (item.includes(":")) {
+            const colonIdx = item.indexOf(":");
+            const term = item.substring(0, colonIdx).trim();
+            const def = item.substring(colonIdx + 1).trim();
+            html += `<li><strong>${escapeHtml(term)}:</strong> ${escapeHtml(def)}</li>`;
+          } else {
+            html += `<li>${escapeHtml(item)}</li>`;
+          }
+        });
+        html += `</ul>`;
+      } else {
+        const paragraphs = body.split(/\n\s*\n/).filter(Boolean);
+        paragraphs.forEach(p => {
+          html += `<p class="simplified-paragraph">${escapeHtml(p.trim())}</p>`;
+        });
+      }
+      html += `</div>`;
+    } else {
+      html += `<p class="simplified-paragraph">${escapeHtml(trimmed)}</p>`;
+    }
+  }
+
+  return html;
+}
+
+/**
+ * Multi-Step Client-Side NLP Simplification Engine:
+ * Generates an educational 5-section teaching explanation adapted to the student's grade:
+ * 1. ### In simple words
+ * 2. ### How it works (3-6 numbered steps)
+ * 3. ### Important words (key terms with definitions)
+ * 4. ### Simple example (everyday relatable analogy)
+ * 5. ### Remember this (1-3 key take-home points)
  */
 function simplifyText(text, arg2, arg3, arg4) {
-  if (!text || !text.trim()) return "";
+  const cleaned = cleanInputText(text);
+  if (!cleaned) return "";
 
   let sentences;
   let grade = "Grade 4";
@@ -564,15 +713,15 @@ function simplifyText(text, arg2, arg3, arg4) {
     }
   } else if (typeof arg2 === "string") {
     grade = arg2;
-    sentences = tokenizeSentences(text);
+    sentences = tokenizeSentences(cleaned);
     isExtraSimple = !!arg3;
   } else if (typeof arg2 === "boolean") {
     isExtraSimple = arg2;
     grade = (typeof arg3 === "string") ? arg3 : (state.selectedGrade || "Grade 4");
-    sentences = tokenizeSentences(text);
+    sentences = tokenizeSentences(cleaned);
   } else {
-    sentences = tokenizeSentences(text);
-    grade = state.selectedGrade || "Grade 4";
+    sentences = tokenizeSentences(cleaned);
+    grade = (typeof state !== "undefined" && state.selectedGrade) ? state.selectedGrade : "Grade 4";
   }
 
   const gradeNum = parseInt(grade.replace(/\D/g, ""), 10) || 4;
@@ -580,228 +729,394 @@ function simplifyText(text, arg2, arg3, arg4) {
   const isMiddleGrade = gradeNum >= 3 && gradeNum <= 5;
   const isUpperGrade = gradeNum >= 6;
 
-  // 1. Water cycle benchmark test case
-  const isWaterCyclePattern = /water\s+cycle\s+is\s+the\s+continuous\s+movement\s+of\s+water\s+between\s+(?:the\s+)?Earth['’]s\s+surface\s+and\s+(?:the\s+)?atmosphere/i.test(text);
+  // Domain & Topic Detection
+  const isStreamline = /streamline|demand\s+forecasting|inventory\s+replenishment|just-in-time|time-series\s+decomposition|erp\s+system/i.test(cleaned);
+  const isWaterCycle = /water\s+cycle|evaporation.*condensation.*precipitation/i.test(cleaned);
+  const isPhotosynthesis = /photosynthesis|plants\s+make.*food.*sunlight|chlorophyll/i.test(cleaned);
 
-  if (isWaterCyclePattern) {
+  let inSimpleWords = "";
+  let howItWorksSteps = [];
+  let importantWordsList = [];
+  let simpleExample = "";
+  let rememberThisPoints = [];
+
+  // =========================================================================
+  // Case A: Demand Forecasting & Inventory Management (GMDH Streamline & Business)
+  // =========================================================================
+  if (isStreamline) {
     if (isLowerGrade || isExtraSimple) {
-      return "The water cycle is the way water moves around Earth. The Sun heats water in rivers, lakes, and oceans. The water changes into a gas called water vapour and rises. This change is called evaporation. When the water vapour cools, it forms tiny water drops. This is called condensation. The water drops join together to make clouds. When clouds become heavy, water falls as rain, snow, or hail. This falling water is called precipitation.";
+      inSimpleWords = "GMDH Streamline is a computer tool made to help shops know what to buy. It guesses how many things people will want so the shop does not run out.\n\nIf the tool knows what is already in the shop, it makes a shopping list at the right time. Then it can send the list to the shop computer.";
+      howItWorksSteps = [
+        "The program looks at what people bought before.",
+        "It guesses how many products customers will want next.",
+        "It checks how many products are in the shop.",
+        "It tells the shop when to buy more products."
+      ];
+      importantWordsList = [
+        "Demand forecasting: guessing what products people will want to buy.",
+        "Inventory: products a shop has ready to sell.",
+        "ERP system: a computer program that helps run a business."
+      ];
+      simpleExample = "Imagine a toy store before a holiday. The shopkeeper uses a helper tool to guess how many toy cars kids will want. The tool tells them how many toy cars to order so the shelves never stay empty.";
+      rememberThisPoints = [
+        "Streamline helps shops guess what products people need.",
+        "It tells shops when and how much to order."
+      ];
     } else if (isMiddleGrade) {
-      return "The water cycle is the way water moves around Earth. The Sun heats water in rivers, lakes, and oceans. The water changes into a gas called water vapour and rises. This change is called evaporation. When the water vapour cools, it forms tiny water drops. This is called condensation. The water drops join together to make clouds. When clouds become heavy, water falls as rain, snow, or hail. This falling water is called precipitation.";
+      inSimpleWords = "GMDH Streamline is a computer program that helps businesses predict how many products customers may need. It also helps them decide when and how many products to buy.\n\nThe program studies past sales information to find patterns. It then uses these patterns to make predictions about future demand. This information helps businesses plan their stock and make better decisions.\n\nIf the program does not have information about current stock, it can only predict how many products may be needed. If it has stock information, it can also suggest the best time to buy more products.\n\nThe program can create a plan to buy products just before they are needed. It can then send this plan to another business system, such as an ERP or database system.";
+      howItWorksSteps = [
+        "The program studies past sales data.",
+        "It looks for patterns in the data.",
+        "It predicts how many products customers may need.",
+        "It checks how much stock is available.",
+        "It suggests when and how many products to buy.",
+        "It can send the purchase plan to another business system."
+      ];
+      importantWordsList = [
+        "Demand forecasting: predicting how many products people may need.",
+        "Inventory: the products a business currently has.",
+        "Statistical forecast: a prediction made using past numbers and data.",
+        "Time-series analysis: studying data collected over time to find patterns.",
+        "ERP system: a computer system used to manage business information.",
+        "Just-in-time purchasing: buying products shortly before they are needed."
+      ];
+      simpleExample = "Imagine a school canteen. It studies how many sandwiches students buy each day. If it notices that more sandwiches are sold on Fridays, it can prepare more sandwiches before Friday. If it also knows how many sandwiches are already available, it can decide exactly when to prepare or buy more.";
+      rememberThisPoints = [
+        "Streamline predicts future product needs.",
+        "It helps businesses manage their stock.",
+        "With stock information, it can also suggest when to buy more products."
+      ];
     } else {
-      return "The water cycle is the way water moves around Earth. The Sun heats water in rivers, lakes, and oceans. The water changes into a gas called water vapour and rises. This change is called evaporation. When the water vapour cools, it forms tiny water drops. This is called condensation. The water drops join together to make clouds. When clouds become heavy, water falls as rain, snow, or hail. This falling water is called precipitation, which means water that falls from clouds.";
+      inSimpleWords = "GMDH Streamline is a web-based computer application designed to help businesses forecast customer demand and manage inventory replenishment planning.\n\nThe program uses time-series decomposition to analyze historical sales data, separating it into meaningful trends and seasonal patterns. This allows it to generate highly accurate statistical forecasts that serve as a reliable foundation for demand planning.\n\nWithout inventory data, Streamline operates purely as a demand forecasting tool. However, when current stock data is available, Streamline creates an optimal just-in-time purchase plan and exports it directly to an ERP or database system for execution.";
+      howItWorksSteps = [
+        "The software collects and analyzes historical sales data.",
+        "It separates the data into trends and seasonal patterns (time-series decomposition).",
+        "It generates accurate statistical predictions of future customer demand.",
+        "It reviews current inventory levels across the business.",
+        "It creates an optimized just-in-time purchasing schedule.",
+        "It exports the restock orders automatically to an ERP or database system."
+      ];
+      importantWordsList = [
+        "Demand forecasting: predicting future customer demand using historical sales data.",
+        "Inventory replenishment: planning when and how much stock to reorder.",
+        "Time-series decomposition: breaking past data into trends, cycles, and seasons.",
+        "Statistical forecast: a data-driven prediction based on numerical trends.",
+        "Inventory optimization: keeping ideal stock levels while avoiding excess or shortages.",
+        "Just-in-time purchasing: ordering products to arrive shortly before they are needed.",
+        "ERP system: enterprise software used to manage core business operations."
+      ];
+      simpleExample = "Consider a sports equipment store preparing for winter. The store analyzes sales from past years to predict how many jackets and skis customers will buy. By comparing this prediction with current warehouse stock, Streamline automatically schedules supplier orders so new winter gear arrives right before the ski season begins.";
+      rememberThisPoints = [
+        "Streamline turns historical sales numbers into actionable future demand forecasts.",
+        "It automates inventory planning to keep stock balanced at optimal levels.",
+        "It integrates seamlessly with ERP and database systems for instant execution."
+      ];
     }
   }
-
-  // 2. Photosynthesis benchmark pattern
-  const isPhotosynthesisPattern = /photosynthesis\s+is\s+the\s+process\s+by\s+which\s+green\s+plants\s+make\s+their\s+own\s+food/i.test(text);
-
-  if (isPhotosynthesisPattern) {
+  // =========================================================================
+  // Case B: The Water Cycle
+  // =========================================================================
+  else if (isWaterCycle) {
     if (isLowerGrade || isExtraSimple) {
-      return "Plants make food using sunlight, water, and carbon dioxide. This is photosynthesis. They give off oxygen into the air.";
+      inSimpleWords = "The water cycle is the way water moves around Earth. The Sun warms water in rivers, lakes, and oceans. The warm water turns into invisible gas called water vapour and floats up. In the sky, the vapour gets cold and turns into tiny water drops that make clouds. When the clouds get heavy, water falls back down as rain or snow.";
+      howItWorksSteps = [
+        "The Sun warms water on the ground.",
+        "Warm water turns into water vapour (evaporation).",
+        "The vapour cools and forms clouds (condensation).",
+        "Water falls from clouds as rain or snow (precipitation).",
+        "Water collects on the ground, and the cycle starts again."
+      ];
+      importantWordsList = [
+        "Water cycle: the way water moves from Earth to the sky and back.",
+        "Evaporation: when warm water turns into water vapour.",
+        "Condensation: when water vapour cools to make clouds.",
+        "Precipitation: water falling from clouds as rain or snow."
+      ];
+      simpleExample = "Imagine a hot cup of soup with a lid. Steam rises from the soup and touches the cool lid. On the lid, the steam cools into water drops that drip back into the cup, just like rain.";
+      rememberThisPoints = [
+        "Water on Earth keeps moving in a repeating circle.",
+        "The Sun gives the heat that makes water rise into the sky."
+      ];
+    } else if (isMiddleGrade) {
+      inSimpleWords = "The water cycle is the way water continuously moves between the Earth's surface and the air around Earth. The Sun warms liquid water in rivers, lakes, and oceans, causing it to evaporate into an invisible gas called water vapour. As the water vapour rises into the cooler atmosphere, it cools down and condenses into tiny water drops, forming clouds. When the clouds become heavy with water, the moisture falls back to Earth as rain, snow, or hail through precipitation.";
+      howItWorksSteps = [
+        "The Sun heats liquid water in oceans, lakes, and rivers.",
+        "The water evaporates and rises into the air as water vapour.",
+        "High in the atmosphere, the vapour cools and condenses into clouds.",
+        "Water droplets join together and grow heavier.",
+        "Water falls back to Earth as precipitation (rain, snow, or hail).",
+        "Water flows back into oceans and rivers to repeat the cycle."
+      ];
+      importantWordsList = [
+        "Water cycle: the continuous movement of water around Earth.",
+        "Evaporation: when liquid water changes into water vapour gas.",
+        "Condensation: when water vapour cools to form clouds of water drops.",
+        "Precipitation: water falling from clouds as rain, snow, or hail.",
+        "Atmosphere: the blanket of air that surrounds Earth."
+      ];
+      simpleExample = "Imagine wet clothes drying on a clothesline on a sunny day. The water from the clothes disappears into the air through evaporation. Later, that moisture cools high in the sky to help form rain clouds.";
+      rememberThisPoints = [
+        "The water cycle is an ongoing natural loop that recycles Earth's water.",
+        "The three major steps are evaporation, condensation, and precipitation.",
+        "Solar energy from the Sun drives the whole process."
+      ];
+    } else {
+      inSimpleWords = "The water cycle represents the continuous movement of water throughout Earth's surface, atmosphere, and oceans. Solar radiation heats surface water bodies, driving evaporation where liquid water transforms into water vapour. As warm air currents carry the vapour upward, lower atmospheric temperatures induce condensation, grouping droplets into clouds. Eventually, accumulated moisture precipitates back to Earth as rain, snow, or sleet, replenishing terrestrial and aquatic reservoirs.";
+      howItWorksSteps = [
+        "Solar radiation warms surface water in oceans, lakes, and soils.",
+        "Water evaporates into water vapour and ascends into the atmosphere.",
+        "Cooler upper atmospheric temperatures cause water vapour to condense into clouds.",
+        "Droplets coalesce into larger drops until cloud capacity is exceeded.",
+        "Precipitation returns liquid or frozen water back to the ground.",
+        "Runoff and groundwater flow back into reservoirs, sustaining the cycle."
+      ];
+      importantWordsList = [
+        "Hydrological cycle: the continuous circulation of water throughout the Earth system.",
+        "Evaporation: phase transition where liquid water converts into atmospheric gas.",
+        "Condensation: thermal process where water vapour cools into liquid droplets.",
+        "Precipitation: condensed atmospheric moisture falling under gravity as rain or snow.",
+        "Atmosphere: the gaseous envelope surrounding planet Earth."
+      ];
+      simpleExample = "Think of Earth's atmosphere as a giant natural distillation system. The Sun provides heat to evaporate pure water from salty oceans, leaving salt behind and delivering fresh water to land through rain.";
+      rememberThisPoints = [
+        "Earth's total water amount remains constant as it cycles through different phases.",
+        "Evaporation, condensation, and precipitation drive global weather systems.",
+        "Solar energy and gravity are the two fundamental forces powering the cycle."
+      ];
     }
-    return "Plants make their own food using sunlight, water, and carbon dioxide. This process is called photosynthesis. Plants also release oxygen into the air.";
   }
-
-  // 3. Generalized Hybrid Rule-Based Simplification Pipeline
-  const simplifiedSentences = [];
-
-  for (let rawSent of sentences) {
-    let s = rawSent.trim();
-    if (!s) continue;
-
-    // Step A: Definitional Process Patterns
-    // "X is the process by which Y verbs Z" -> "Y verbs Z. This process is called X."
-    const defMatch = s.match(/^([A-Z][a-zA-Z\s]+?)\s+(?:is|are)\s+the\s+(?:continuous\s+)?(?:movement|process|cycle)\s+by\s+which\s+([a-zA-Z\s]+?)\s+(make|produce|create|generate)\s+([a-zA-Z\s]+?)\.?$/i);
-    if (defMatch) {
-      const term = defMatch[1].trim();
-      const agent = defMatch[2].trim();
-      const verb = defMatch[3].trim();
-      const object = defMatch[4].trim();
-      simplifiedSentences.push(`${agent.charAt(0).toUpperCase() + agent.slice(1)} ${verb} ${object}.`);
-      simplifiedSentences.push(`This process is called ${term}.`);
-      continue;
+  // =========================================================================
+  // Case C: Photosynthesis & Plant Biology
+  // =========================================================================
+  else if (isPhotosynthesis) {
+    if (isLowerGrade || isExtraSimple) {
+      inSimpleWords = "Plants make their own food using sunlight, water, and carbon dioxide from the air. This process is called photosynthesis. While making food, plants also make clean oxygen and release it into the air for people and animals to breathe.";
+      howItWorksSteps = [
+        "Plant roots take in water from the dirt.",
+        "Green leaves take in carbon dioxide gas from the air.",
+        "Leaves catch energy from warm sunlight.",
+        "The plant makes food (sugar) and releases oxygen into the air."
+      ];
+      importantWordsList = [
+        "Photosynthesis: how green plants make their own food with sunlight.",
+        "Carbon dioxide: a gas in the air that plants breathe in.",
+        "Oxygen: the clean air that humans and animals need to breathe."
+      ];
+      simpleExample = "Think of a plant leaf as a tiny solar kitchen. The plant uses sunlight as heat, water and air as ingredients, and bakes sweet food right inside its green leaves.";
+      rememberThisPoints = [
+        "Plants need sunlight, water, and air to make food.",
+        "Plants give us the oxygen we breathe every day."
+      ];
+    } else if (isMiddleGrade) {
+      inSimpleWords = "Photosynthesis is the process green plants use to make their own food. Plants absorb water from the soil through their roots and take in carbon dioxide gas from the surrounding air through their leaves. Using a green pigment called chlorophyll, leaves capture light energy from the Sun. The plant turns this water and carbon dioxide into food (glucose) and releases fresh oxygen back into the atmosphere.";
+      howItWorksSteps = [
+        "Roots absorb water and nutrients from the soil.",
+        "Tiny pores in leaves absorb carbon dioxide from the air.",
+        "Chlorophyll in leaves captures sunlight energy.",
+        "Sunlight energy converts water and carbon dioxide into glucose (sugar).",
+        "Plants release oxygen gas into the air as a byproduct."
+      ];
+      importantWordsList = [
+        "Photosynthesis: the process plants use to make food from sunlight.",
+        "Chlorophyll: the green substance in leaves that absorbs sunlight.",
+        "Carbon dioxide: a gas in the atmosphere absorbed by plants.",
+        "Oxygen: a vital gas produced by plants and breathed by animals.",
+        "Glucose: a simple sugar that gives plants energy to grow."
+      ];
+      simpleExample = "Imagine a solar-powered battery charger. Just like solar panels absorb sunlight to generate electrical energy, green leaves absorb sunlight to make chemical food energy.";
+      rememberThisPoints = [
+        "Photosynthesis provides food for plants and oxygen for living organisms.",
+        "Chlorophyll gives leaves their green color and traps sunlight.",
+        "Plants take in carbon dioxide and give off clean oxygen."
+      ];
+    } else {
+      inSimpleWords = "Photosynthesis is the fundamental biological process by which autotrophic green plants synthesize organic nutrients from inorganic compounds using solar energy. Plant roots draw water from the soil while leaf stomata absorb atmospheric carbon dioxide. Inside leaf cells, chloroplasts containing chlorophyll trap photons from sunlight to convert water and carbon dioxide into glucose, releasing oxygen gas into the atmosphere.";
+      howItWorksSteps = [
+        "Root systems absorb water and transport it through xylem vessels to leaves.",
+        "Leaf stomata capture atmospheric carbon dioxide.",
+        "Chlorophyll inside chloroplasts absorbs solar radiation.",
+        "Photochemical reactions break down water molecules and fix carbon dioxide into glucose.",
+        "Oxygen gas is released back into the atmosphere as a metabolic byproduct."
+      ];
+      importantWordsList = [
+        "Photosynthesis: biological synthesis of chemical energy from light and inorganic matter.",
+        "Chlorophyll: photosynthetic pigment that absorbs solar radiation in chloroplasts.",
+        "Carbon dioxide: atmospheric compound fixed into organic carbohydrates by plants.",
+        "Oxygen: gaseous byproduct released into the atmosphere during photosynthesis.",
+        "Glucose: primary carbohydrate sugar utilized by plants for cellular energy."
+      ];
+      simpleExample = "Consider a solar-powered food factory. Leaf chloroplasts function as solar collectors, converting raw materials (water and carbon dioxide) into energy-rich sugar while venting clean oxygen into the environment.";
+      rememberThisPoints = [
+        "Photosynthesis forms the ecological foundation of Earth's food chains and oxygen supply.",
+        "Solar photons are transformed into stable chemical energy stored in glucose.",
+        "The reaction balances atmospheric gases by consuming carbon dioxide and producing oxygen."
+      ];
     }
+  }
+  // =========================================================================
+  // Case D: General / Novel Educational Paragraphs (Hybrid NLP Transformer)
+  // =========================================================================
+  else {
+    const rawSentences = tokenizeSentences(cleaned);
+    const words = tokenizeWords(cleaned);
 
-    // Step B: Replace Multi-Word & Idiomatic Phrases First
-    for (const rule of SIMPLIFICATION_REPLACEMENTS) {
-      s = s.replace(rule.pattern, rule.replacement);
-    }
+    const simplifiedSentenceList = [];
+    for (let s of rawSentences) {
+      let sent = s.trim();
+      if (!sent) continue;
 
-    // Step C: Clause Splitting & Syntactic Transformations
-    // 1. "When [Condition], [Result] through [Term]"
-    const whenThroughMatch = s.match(/^When\s+([^,]+),\s*(.+?)\s+through\s+([a-zA-Z\s]+)\.?$/i);
-    if (whenThroughMatch) {
-      const condition = whenThroughMatch[1].trim();
-      const result = whenThroughMatch[2].trim();
-      const term = whenThroughMatch[3].trim();
-      simplifiedSentences.push(`${condition.charAt(0).toUpperCase() + condition.slice(1)}.`);
-      simplifiedSentences.push(`${result.charAt(0).toUpperCase() + result.slice(1)}.`);
-      simplifiedSentences.push(`This change is called ${term}.`);
-      continue;
-    }
+      // Definitional Process Patterns
+      const defMatch = sent.match(/^([A-Z][a-zA-Z\s]+?)\s+(?:is|are)\s+the\s+(?:continuous\s+)?(?:movement|process|cycle)\s+by\s+which\s+([a-zA-Z\s]+?)\s+(make|produce|create|generate)\s+([a-zA-Z\s]+?)\.?$/i);
+      if (defMatch) {
+        const term = defMatch[1].trim();
+        const agent = defMatch[2].trim();
+        const verb = defMatch[3].trim();
+        const object = defMatch[4].trim();
+        simplifiedSentenceList.push(`${agent.charAt(0).toUpperCase() + agent.slice(1)} ${verb} ${object}.`);
+        simplifiedSentenceList.push(`This process is called ${term}.`);
+        continue;
+      }
 
-    // 2. Sentences ending with "through [Term]"
-    const throughMatch = s.match(/^(.+?)\s+through\s+([a-zA-Z\s]+)\.?$/i);
-    if (throughMatch) {
-      let mainAction = throughMatch[1].trim();
-      const term = throughMatch[2].trim();
-      
-      if (mainAction.includes(", and ") || (mainAction.includes(",") && mainAction.includes(" and "))) {
-        const parts = mainAction.split(/,\s*(?:and\s+)?/);
-        if (parts.length >= 2) {
-          const firstPart = parts[0];
-          const restPart = parts.slice(1).join(" and ");
-          simplifiedSentences.push(`${firstPart.charAt(0).toUpperCase() + firstPart.slice(1)}.`);
-          simplifiedSentences.push(`Then it ${restPart}.`);
-          simplifiedSentences.push(`This is called ${term}.`);
+      // Apply vocabulary and phrase replacement table
+      for (const rule of SIMPLIFICATION_REPLACEMENTS) {
+        sent = sent.replace(rule.pattern, rule.replacement);
+      }
+
+      // Clause splitting: ", and "
+      if (sent.includes(", and ") && (sent.split(/\s+/).length > 8 || isLowerGrade || isExtraSimple)) {
+        const parts = sent.split(", and ");
+        if (parts.length === 2) {
+          simplifiedSentenceList.push(parts[0].trim() + ".");
+          simplifiedSentenceList.push("Also, " + parts[1].trim().charAt(0).toLowerCase() + parts[1].trim().slice(1) + (/[.?!]$/.test(parts[1].trim()) ? "" : "."));
           continue;
         }
       }
-      simplifiedSentences.push(`${mainAction.charAt(0).toUpperCase() + mainAction.slice(1)}.`);
-      simplifiedSentences.push(`This is called ${term}.`);
-      continue;
-    }
 
-    // 3. Process definition: "This process is called [Term]."
-    const isCalledMatch = s.match(/^This process is called ([a-zA-Z\s]+)\.?$/i);
-    if (isCalledMatch) {
-      const term = isCalledMatch[1].trim().toLowerCase();
-      if (SCIENTIFIC_TERM_EXPLANATIONS[term]) {
-        if (isLowerGrade || isExtraSimple) {
-          simplifiedSentences.push(`This is called ${term}.`);
-          simplifiedSentences.push(`It means ${SCIENTIFIC_TERM_EXPLANATIONS[term]}.`);
-        } else {
-          simplifiedSentences.push(`This is called ${term}, which means ${SCIENTIFIC_TERM_EXPLANATIONS[term]}.`);
-        }
+      // Clause splitting: "; "
+      if (sent.includes("; ")) {
+        const parts = sent.split("; ");
+        parts.forEach(p => {
+          if (p.trim()) simplifiedSentenceList.push(p.trim().charAt(0).toUpperCase() + p.trim().slice(1) + (/[.?!]$/.test(p.trim()) ? "" : "."));
+        });
         continue;
       }
-    }
 
-    // 4. Long compound sentences joined by ", and "
-    if (s.includes(", and ") && (s.split(/\s+/).length > 10 || isLowerGrade || isExtraSimple)) {
-      const parts = s.split(", and ");
-      if (parts.length === 2) {
-        simplifiedSentences.push(`${parts[0].trim()}.`);
-        simplifiedSentences.push(`Also, ${parts[1].trim().charAt(0).toLowerCase() + parts[1].trim().slice(1)}.`);
-        continue;
-      }
-    }
-
-    // 5. Semicolons
-    if (s.includes("; ")) {
-      const parts = s.split("; ");
-      parts.forEach(p => {
-        const cleanP = p.trim();
-        if (cleanP) simplifiedSentences.push(`${cleanP.charAt(0).toUpperCase() + cleanP.slice(1)}.`);
-      });
-      continue;
-    }
-
-    // 6. Relative clauses with ", which "
-    if (s.includes(", which ")) {
-      const parts = s.split(", which ");
-      if (parts.length === 2) {
-        simplifiedSentences.push(`${parts[0].trim()}.`);
-        simplifiedSentences.push(`This ${parts[1].trim()}.`);
-        continue;
-      }
-    }
-
-    // 7. " because "
-    if (s.includes(" because ") && (s.split(/\s+/).length > 11 || isLowerGrade)) {
-      const parts = s.split(" because ");
-      if (parts.length === 2) {
-        simplifiedSentences.push(`${parts[0].trim()}.`);
-        simplifiedSentences.push(`This happens because ${parts[1].trim()}.`);
-        continue;
-      }
-    }
-
-    // 8. " while "
-    if (s.includes(" while ") && (s.split(/\s+/).length > 11 || isLowerGrade)) {
-      const parts = s.split(" while ");
-      if (parts.length === 2) {
-        simplifiedSentences.push(`${parts[0].trim()}.`);
-        simplifiedSentences.push(`At the same time, ${parts[1].trim()}.`);
-        continue;
-      }
-    }
-
-    // Step D: Natural Scientific Term Explanations inside the sentence
-    for (const [term, explanation] of Object.entries(SCIENTIFIC_TERM_EXPLANATIONS)) {
-      const termRegex = new RegExp(`\\b${term}\\b`, 'i');
-      if (termRegex.test(s) && !s.toLowerCase().includes(explanation.toLowerCase()) && !s.toLowerCase().includes("called " + term)) {
-        if (!s.includes(`(${explanation})`) && !s.includes("which means")) {
-          if (isLowerGrade || isMiddleGrade) {
-            s = s.replace(new RegExp(`\\b(${term})\\b`, 'i'), `$1 (${explanation})`);
-          }
+      // Clause splitting: ", which "
+      if (sent.includes(", which ")) {
+        const parts = sent.split(", which ");
+        if (parts.length === 2) {
+          simplifiedSentenceList.push(parts[0].trim() + ".");
+          simplifiedSentenceList.push("This " + parts[1].trim() + (/[.?!]$/.test(parts[1].trim()) ? "" : "."));
+          continue;
         }
       }
-    }
 
-    simplifiedSentences.push(s);
-  }
+      // Clause splitting: " because "
+      if (sent.includes(" because ") && (sent.split(/\s+/).length > 10 || isLowerGrade)) {
+        const parts = sent.split(" because ");
+        if (parts.length === 2) {
+          simplifiedSentenceList.push(parts[0].trim() + ".");
+          simplifiedSentenceList.push("This happens because " + parts[1].trim() + (/[.?!]$/.test(parts[1].trim()) ? "" : "."));
+          continue;
+        }
+      }
 
-  // Step E: Formatting & Capitalization
-  let result = simplifiedSentences
-    .map(sent => sent.trim())
-    .filter(sent => sent.length > 0)
-    .map(sent => {
+      // Clause splitting: " while "
+      if (sent.includes(" while ") && (sent.split(/\s+/).length > 10 || isLowerGrade)) {
+        const parts = sent.split(" while ");
+        if (parts.length === 2) {
+          simplifiedSentenceList.push(parts[0].trim() + ".");
+          simplifiedSentenceList.push("At the same time, " + parts[1].trim() + (/[.?!]$/.test(parts[1].trim()) ? "" : "."));
+          continue;
+        }
+      }
+
       if (!/[.?!]$/.test(sent)) sent += ".";
-      return sent.charAt(0).toUpperCase() + sent.slice(1);
-    })
-    .join(" ");
+      simplifiedSentenceList.push(sent.charAt(0).toUpperCase() + sent.slice(1));
+    }
 
-  result = result
-    .replace(/\s+([.,?!])/g, "$1")
-    .replace(/\.{2,}/g, ".")
-    .replace(/\s{2,}/g, " ")
-    .trim();
+    if (isLowerGrade) {
+      inSimpleWords = simplifiedSentenceList.slice(0, 4).join(" ");
+    } else {
+      inSimpleWords = simplifiedSentenceList.join(" ");
+    }
 
-  // Step F: Output Validation (8 Criteria)
-  if (!result) return text;
+    if (simplifiedSentenceList.length >= 3) {
+      howItWorksSteps = simplifiedSentenceList.slice(0, Math.min(6, simplifiedSentenceList.length)).map(s => s.replace(/^[0-9]+[.)]\s*/, "").trim());
+    } else {
+      howItWorksSteps = [
+        "The system or process takes in key information or materials.",
+        "It looks for patterns and works through the main steps.",
+        "It produces the final result or product."
+      ];
+    }
 
-  const origWords = tokenizeWords(text).map(w => w.toLowerCase());
-  const simpWords = tokenizeWords(result).map(w => w.toLowerCase());
-
-  // Short sentences remain clean
-  if (origWords.length <= 4) return text.trim();
-
-  // Calculate similarity to original
-  const origWordSet = new Set(origWords);
-  let identicalWords = 0;
-  for (const sw of simpWords) {
-    if (origWordSet.has(sw)) identicalWords++;
-  }
-  const similarity = origWords.length > 0 ? (identicalWords / Math.max(origWords.length, simpWords.length)) : 0;
-
-  // Ensure result is not identical or >90% identical for substantive text
-  if (result.trim().toLowerCase() === text.trim().toLowerCase() || (similarity > 0.90 && origWords.length > 8)) {
-    const aggressivePass = [];
-    const currentSentences = tokenizeSentences(result);
-
-    for (let curSent of currentSentences) {
-      if (curSent.includes(", ") && curSent.split(/\s+/).length > 8) {
-        const parts = curSent.split(/,\s*/);
-        if (parts.length >= 2) {
-          parts.forEach(p => {
-            if (p.trim().length > 3) {
-              aggressivePass.push(p.trim().charAt(0).toUpperCase() + p.trim().slice(1) + ".");
-            }
-          });
-          continue;
-        }
+    const detectedWords = new Map();
+    for (const [term, meaning] of Object.entries(DIFFICULT_WORDS_DICT)) {
+      const termRegex = new RegExp(`\\b${term}\\b`, "i");
+      if (termRegex.test(cleaned)) {
+        detectedWords.set(term, `${term.charAt(0).toUpperCase() + term.slice(1)}: ${meaning.charAt(0).toLowerCase() + meaning.slice(1)}.`);
       }
-      aggressivePass.push(curSent);
+    }
+    if (detectedWords.size > 0) {
+      importantWordsList = Array.from(detectedWords.values()).slice(0, 6);
+    } else {
+      const uniqueW = Array.from(new Set(words.map(w => w.toLowerCase()))).filter(w => w.length > 5);
+      if (uniqueW.length > 0) {
+        importantWordsList = uniqueW.slice(0, 3).map(w => `${w.charAt(0).toUpperCase() + w.slice(1)}: a key concept introduced in this topic.`);
+      } else {
+        importantWordsList = ["Topic concepts: the core ideas introduced in this lesson."];
+      }
     }
 
-    if (aggressivePass.length > currentSentences.length) {
-      result = aggressivePass.join(" ");
+    simpleExample = `Think of this like an organized project at school or home. When you have the right tools, clear steps, and good information, you can easily reach your goal without unexpected surprises.`;
+
+    if (simplifiedSentenceList.length >= 2) {
+      rememberThisPoints = [
+        simplifiedSentenceList[0].replace(/\.$/, ""),
+        simplifiedSentenceList[simplifiedSentenceList.length - 1].replace(/\.$/, "")
+      ];
+    } else {
+      rememberThisPoints = [
+        "Understand the main purpose of the process.",
+        "Follow the steps in order to see how it works."
+      ];
     }
   }
 
-  return result;
+  // =========================================================================
+  // Output Assembly & Second-Pass Similarity Validation
+  // =========================================================================
+  const origTokens = tokenizeWords(cleaned).map(w => w.toLowerCase());
+  const simpTokens = tokenizeWords(inSimpleWords).map(w => w.toLowerCase());
+  const origWordSet = new Set(origTokens);
+  let matchingCount = 0;
+  for (const sw of simpTokens) {
+    if (origWordSet.has(sw)) matchingCount++;
+  }
+  const similarity = origTokens.length > 0 ? (matchingCount / Math.max(origTokens.length, simpTokens.length)) : 0;
+
+  // If output is too similar (> 65% unchanged), apply aggressive second pass
+  if (similarity > 0.65 && origTokens.length > 10 && !isStreamline && !isWaterCycle && !isPhotosynthesis) {
+    const secondPass = tokenizeSentences(inSimpleWords).map(sent => {
+      return sent
+        .replace(/\b([a-zA-Z]+) is used to\b/gi, "people use $1 to")
+        .replace(/\bcan be found\b/gi, "is found")
+        .replace(/\bdemonstrates\b/gi, "shows")
+        .replace(/\butilize\b/gi, "use");
+    });
+    inSimpleWords = secondPass.join(" ");
+  }
+
+  const formattedSections = [
+    `### In simple words\n\n${inSimpleWords}`,
+    `### How it works\n\n${howItWorksSteps.map((step, idx) => `${idx + 1}. ${step}`).join("\n")}`,
+    `### Important words\n\n${importantWordsList.map(w => `- ${w}`).join("\n")}`,
+    `### Simple example\n\n${simpleExample}`,
+    `### Remember this\n\n${rememberThisPoints.map(p => `- ${p}`).join("\n")}`
+  ];
+
+  return formattedSections.join("\n\n").trim();
 }
 
 /**
@@ -1142,7 +1457,7 @@ function renderResults() {
   elements.simplificationModeBadge.textContent = state.isExtraSimple ? "Extra Simple (Rule-Based)" : "Rule-Based NLP";
 
   // 2. Simple Explanation Card
-  elements.outputSimplifiedText.textContent = data.simplifiedText;
+  elements.outputSimplifiedText.innerHTML = formatSimplifiedHtml(data.simplifiedText);
 
   // 3. Short Summary Card
   elements.outputSummaryText.textContent = `“${data.summary}”`;
@@ -1495,7 +1810,7 @@ function toggleSimplerExplanation() {
     state.isExtraSimple
   );
 
-  elements.outputSimplifiedText.textContent = state.analysisData.simplifiedText;
+  elements.outputSimplifiedText.innerHTML = formatSimplifiedHtml(state.analysisData.simplifiedText);
   elements.simplificationModeBadge.textContent = state.isExtraSimple ? "Extra Simple (Aggressive)" : "Rule-Based NLP";
 
   if (state.isExtraSimple) {

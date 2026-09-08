@@ -629,15 +629,66 @@ textarea#input-text:focus {
 
 /* Card 1: Simple Explanation */
 .simplified-text-box {
-  font-size: 1.12rem;
-  line-height: 1.75;
+  font-size: 1.05rem;
+  line-height: 1.7;
   color: #1e293b;
-  font-weight: 500;
+  font-weight: 400;
   background: #f8fafc;
-  padding: 1.15rem 1.35rem;
+  padding: 1.25rem 1.4rem;
   border-radius: var(--radius-md);
   border-left: 4px solid var(--primary);
   margin-bottom: 1rem;
+}
+
+.simplified-section {
+  margin-bottom: 1.35rem;
+}
+
+.simplified-section:last-child {
+  margin-bottom: 0;
+}
+
+.simplified-section-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.simplified-section-title .section-icon {
+  font-size: 1.1rem;
+}
+
+.simplified-paragraph {
+  margin-bottom: 0.65rem;
+  line-height: 1.7;
+  color: #334155;
+}
+
+.simplified-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.simplified-numbered-list,
+.simplified-bullet-list {
+  padding-left: 1.4rem;
+  margin: 0.4rem 0 0.65rem;
+}
+
+.simplified-numbered-list li,
+.simplified-bullet-list li {
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.simplified-bullet-list li strong {
+  color: #0f172a;
+  font-weight: 600;
 }
 
 .disclaimer-note {
