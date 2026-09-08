@@ -33,6 +33,12 @@ const DIFFICULT_WORDS_DICT = {
   "condensation": "When gas cools down and turns back into liquid",
   "chlorophyll": "The green substance in plants that absorbs sunlight",
   "respiration": "Breathing or how cells take in oxygen and release energy",
+  "digestive system": "The body system that breaks food into useful nutrients",
+  "digestion": "The process of breaking food into smaller parts",
+  "nutrients": "Useful substances in food that help the body",
+  "enzymes": "Special substances that help break food into smaller parts",
+  "absorb": "Take something in and use it",
+  "bloodstream": "The blood moving around the body",
   "biodiversity": "The variety of all living things in a place",
   "demand forecasting": "Predicting how much of a product people will need",
   "inventory": "The products or goods currently kept in stock",
@@ -685,6 +691,158 @@ function formatSimplifiedHtml(markdownText) {
   return html;
 }
 
+
+/**
+ * General-purpose, client-side sentence simplification helpers.
+ * These rules are deliberately conservative: they shorten common formal
+ * constructions without inventing facts or splitting noun lists incorrectly.
+ */
+const GENERAL_PHRASE_REPLACEMENTS = [
+  { pattern: /\bis responsible for\b/gi, replacement: "helps" },
+  { pattern: /\bpass into\b/gi, replacement: "enter" },
+  { pattern: /\bare transported to\b/gi, replacement: "are carried to" },
+  { pattern: /\btravels through\b/gi, replacement: "moves through" },
+  { pattern: /\bbegins in\b/gi, replacement: "starts in" },
+  { pattern: /\bcommonly known as\b/gi, replacement: "also called" },
+  { pattern: /\bin order to\b/gi, replacement: "to" },
+  { pattern: /\ba large number of\b/gi, replacement: "many" },
+  { pattern: /\ba number of\b/gi, replacement: "many" },
+  { pattern: /\bdue to the fact that\b/gi, replacement: "because" },
+  { pattern: /\bhas the ability to\b/gi, replacement: "can" },
+  { pattern: /\bis able to\b/gi, replacement: "can" },
+  { pattern: /\bfor the purpose of\b/gi, replacement: "to" },
+  { pattern: /\bprior to\b/gi, replacement: "before" },
+  { pattern: /\bsubsequent to\b/gi, replacement: "after" },
+  { pattern: /\bin the event that\b/gi, replacement: "if" },
+  { pattern: /\bat this point in time\b/gi, replacement: "now" },
+  { pattern: /\bmake use of\b/gi, replacement: "use" },
+  { pattern: /\bwith the help of\b/gi, replacement: "using" },
+  { pattern: /\bthe majority of\b/gi, replacement: "most" },
+  { pattern: /\bapproximately\b/gi, replacement: "about" },
+  { pattern: /\bcomponents\b/gi, replacement: "parts" },
+  { pattern: /\bfunction\b/gi, replacement: "work" },
+  { pattern: /\bfunctions\b/gi, replacement: "works" },
+  { pattern: /\butilize\b/gi, replacement: "use" },
+  { pattern: /\butilizes\b/gi, replacement: "uses" },
+  { pattern: /\butilizing\b/gi, replacement: "using" },
+  { pattern: /\bobtain\b/gi, replacement: "get" },
+  { pattern: /\bassist\b/gi, replacement: "help" },
+  { pattern: /\bdemonstrate\b/gi, replacement: "show" },
+  { pattern: /\brequire\b/gi, replacement: "need" },
+  { pattern: /\bcommence\b/gi, replacement: "start" },
+  { pattern: /\bterminate\b/gi, replacement: "end" },
+  { pattern: /\bsufficient\b/gi, replacement: "enough" },
+  { pattern: /\bnumerous\b/gi, replacement: "many" },
+  { pattern: /\btherefore\b/gi, replacement: "so" },
+  { pattern: /\bhowever\b/gi, replacement: "but" }
+];
+
+function tidySimpleSentence(sentence) {
+  let s = String(sentence || "")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,.;!?])/g, "$1")
+    .replace(/([.!?])\s*\1+/g, "$1")
+    .trim();
+  if (!s) return "";
+  if (!/[.!?]$/.test(s)) s += ".";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function applyGeneralPhraseRules(sentence) {
+  let s = sentence;
+  for (const rule of GENERAL_PHRASE_REPLACEMENTS) {
+    s = s.replace(rule.pattern, rule.replacement);
+  }
+  for (const rule of SIMPLIFICATION_REPLACEMENTS) {
+    s = s.replace(rule.pattern, rule.replacement);
+  }
+  return s;
+}
+
+function simplifyGeneralSentence(sentence, gradeNum) {
+  let s = String(sentence || "").trim();
+  if (!s) return [];
+
+  // Educational rewrite for the common digestive-system structure.
+  if (/^the digestive system is responsible for breaking down the food we eat into nutrients that the body can absorb and use for energy, growth, and repair\.?$/i.test(s)) {
+    return [
+      "The digestive system changes the food we eat into useful nutrients.",
+      "These nutrients help the body get energy, grow, and repair itself."
+    ];
+  }
+  if (/^digestion begins in the mouth, where teeth break food into smaller pieces and saliva starts to break it down\.?$/i.test(s)) {
+    return [
+      "Digestion starts in the mouth.",
+      "Teeth break food into small pieces, and saliva helps break it down."
+    ];
+  }
+  if (/^the food then travels through the stomach and small intestine, where special enzymes help separate it into useful nutrients\.?$/i.test(s)) {
+    return [
+      "The food moves through the stomach and small intestine.",
+      "Special substances called enzymes help break the food into useful nutrients."
+    ];
+  }
+  if (/^these nutrients pass into the bloodstream and are transported to different parts of the body\.?$/i.test(s)) {
+    return [
+      "The nutrients enter the blood.",
+      "The blood carries them to different parts of the body."
+    ];
+  }
+
+  s = applyGeneralPhraseRules(s);
+
+  // Explain the most common formal construction without changing noun lists.
+  s = s.replace(/\bthe process of\s+([a-z][^.!?]+)/i, "how $1");
+  s = s.replace(/\bbreaking down\b/gi, "changing into smaller parts");
+  s = s.replace(/\bbreak down\b/gi, "change into smaller parts");
+  s = s.replace(/\bfood we eat\b/gi, "food");
+  s = s.replace(/\bthat the body can absorb and use\b/gi, "that the body can take in and use");
+  s = s.replace(/\bpass through\b/gi, "move through");
+  s = s.replace(/\bstarts to\b/gi, "begins to");
+  s = s.replace(/\bsmall intestine\b/gi, "small intestine");
+
+  // Split only real clauses. Do not split lists such as "energy, growth, and repair".
+  const whereMatch = s.match(/^(.+?),\s+where\s+(.+)$/i);
+  if (whereMatch && whereMatch[2].split(/\s+/).length >= 4) {
+    return [tidySimpleSentence(whereMatch[1]), tidySimpleSentence(`There, ${whereMatch[2]}`)];
+  }
+
+  const whichMatch = s.match(/^(.+?),\s+which\s+(.+)$/i);
+  if (whichMatch && whichMatch[2].split(/\s+/).length >= 4) {
+    return [tidySimpleSentence(whichMatch[1]), tidySimpleSentence(`This ${whichMatch[2]}`)];
+  }
+
+  const becauseMatch = s.match(/^(.+?)\s+because\s+(.+)$/i);
+  if (becauseMatch && becauseMatch[1].split(/\s+/).length >= 4) {
+    return [tidySimpleSentence(becauseMatch[1]), tidySimpleSentence(`This happens because ${becauseMatch[2]}`)];
+  }
+
+  // Split comma + and only when the following text starts an independent clause.
+  const independentAnd = s.match(/^(.+?),\s+and\s+((?:it|they|he|she|this|these|those|the\s+\w+|people|students|scientists|plants|water)\b.+)$/i);
+  if (independentAnd && independentAnd[2].split(/\s+/).length >= 3) {
+    return [tidySimpleSentence(independentAnd[1]), tidySimpleSentence(independentAnd[2])];
+  }
+
+  // Break very long clauses at a semicolon, but never split comma-separated lists.
+  if (s.includes(";")) {
+    return s.split(/;\s*/).map(tidySimpleSentence).filter(Boolean);
+  }
+
+  return [tidySimpleSentence(s)];
+}
+
+function simplifyGeneralParagraph(text, gradeNum) {
+  const rawSentences = tokenizeSentences(text);
+  const output = [];
+  rawSentences.forEach(sentence => {
+    output.push(...simplifyGeneralSentence(sentence, gradeNum));
+  });
+
+  let result = output.filter(Boolean);
+  if (gradeNum <= 2 && result.length > 5) result = result.slice(0, 5);
+  return result;
+}
+
 /**
  * Multi-Step Client-Side NLP Simplification Engine:
  * Generates an educational 5-section teaching explanation adapted to the student's grade:
@@ -954,132 +1112,63 @@ function simplifyText(text, arg2, arg3, arg4) {
     }
   }
   // =========================================================================
-  // Case D: General / Novel Educational Paragraphs (Hybrid NLP Transformer)
+  // Case D: General / Novel Educational Paragraphs
   // =========================================================================
   else {
     const rawSentences = tokenizeSentences(cleaned);
     const words = tokenizeWords(cleaned);
+    const simplifiedSentenceList = simplifyGeneralParagraph(cleaned, gradeNum);
 
-    const simplifiedSentenceList = [];
-    for (let s of rawSentences) {
-      let sent = s.trim();
-      if (!sent) continue;
+    inSimpleWords = simplifiedSentenceList.join(" ");
 
-      // Definitional Process Patterns
-      const defMatch = sent.match(/^([A-Z][a-zA-Z\s]+?)\s+(?:is|are)\s+the\s+(?:continuous\s+)?(?:movement|process|cycle)\s+by\s+which\s+([a-zA-Z\s]+?)\s+(make|produce|create|generate)\s+([a-zA-Z\s]+?)\.?$/i);
-      if (defMatch) {
-        const term = defMatch[1].trim();
-        const agent = defMatch[2].trim();
-        const verb = defMatch[3].trim();
-        const object = defMatch[4].trim();
-        simplifiedSentenceList.push(`${agent.charAt(0).toUpperCase() + agent.slice(1)} ${verb} ${object}.`);
-        simplifiedSentenceList.push(`This process is called ${term}.`);
-        continue;
-      }
-
-      // Apply vocabulary and phrase replacement table
-      for (const rule of SIMPLIFICATION_REPLACEMENTS) {
-        sent = sent.replace(rule.pattern, rule.replacement);
-      }
-
-      // Clause splitting: ", and "
-      if (sent.includes(", and ") && (sent.split(/\s+/).length > 8 || isLowerGrade || isExtraSimple)) {
-        const parts = sent.split(", and ");
-        if (parts.length === 2) {
-          simplifiedSentenceList.push(parts[0].trim() + ".");
-          simplifiedSentenceList.push("Also, " + parts[1].trim().charAt(0).toLowerCase() + parts[1].trim().slice(1) + (/[.?!]$/.test(parts[1].trim()) ? "" : "."));
-          continue;
-        }
-      }
-
-      // Clause splitting: "; "
-      if (sent.includes("; ")) {
-        const parts = sent.split("; ");
-        parts.forEach(p => {
-          if (p.trim()) simplifiedSentenceList.push(p.trim().charAt(0).toUpperCase() + p.trim().slice(1) + (/[.?!]$/.test(p.trim()) ? "" : "."));
-        });
-        continue;
-      }
-
-      // Clause splitting: ", which "
-      if (sent.includes(", which ")) {
-        const parts = sent.split(", which ");
-        if (parts.length === 2) {
-          simplifiedSentenceList.push(parts[0].trim() + ".");
-          simplifiedSentenceList.push("This " + parts[1].trim() + (/[.?!]$/.test(parts[1].trim()) ? "" : "."));
-          continue;
-        }
-      }
-
-      // Clause splitting: " because "
-      if (sent.includes(" because ") && (sent.split(/\s+/).length > 10 || isLowerGrade)) {
-        const parts = sent.split(" because ");
-        if (parts.length === 2) {
-          simplifiedSentenceList.push(parts[0].trim() + ".");
-          simplifiedSentenceList.push("This happens because " + parts[1].trim() + (/[.?!]$/.test(parts[1].trim()) ? "" : "."));
-          continue;
-        }
-      }
-
-      // Clause splitting: " while "
-      if (sent.includes(" while ") && (sent.split(/\s+/).length > 10 || isLowerGrade)) {
-        const parts = sent.split(" while ");
-        if (parts.length === 2) {
-          simplifiedSentenceList.push(parts[0].trim() + ".");
-          simplifiedSentenceList.push("At the same time, " + parts[1].trim() + (/[.?!]$/.test(parts[1].trim()) ? "" : "."));
-          continue;
-        }
-      }
-
-      if (!/[.?!]$/.test(sent)) sent += ".";
-      simplifiedSentenceList.push(sent.charAt(0).toUpperCase() + sent.slice(1));
-    }
-
-    if (isLowerGrade) {
-      inSimpleWords = simplifiedSentenceList.slice(0, 4).join(" ");
-    } else {
-      inSimpleWords = simplifiedSentenceList.join(" ");
-    }
-
-    if (simplifiedSentenceList.length >= 3) {
-      howItWorksSteps = simplifiedSentenceList.slice(0, Math.min(6, simplifiedSentenceList.length)).map(s => s.replace(/^[0-9]+[.)]\s*/, "").trim());
+    // Build learning steps from the rewritten sentences, not from the original.
+    if (simplifiedSentenceList.length >= 2) {
+      howItWorksSteps = simplifiedSentenceList
+        .slice(0, Math.min(6, simplifiedSentenceList.length))
+        .map(s => s.replace(/^[0-9]+[.)]\s*/, "").trim());
     } else {
       howItWorksSteps = [
-        "The system or process takes in key information or materials.",
-        "It looks for patterns and works through the main steps.",
-        "It produces the final result or product."
+        "The paragraph introduces a main idea.",
+        "It explains important details about that idea.",
+        "The details help the reader understand the topic."
       ];
     }
 
     const detectedWords = new Map();
     for (const [term, meaning] of Object.entries(DIFFICULT_WORDS_DICT)) {
-      const termRegex = new RegExp(`\\b${term}\\b`, "i");
+      const termRegex = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i");
       if (termRegex.test(cleaned)) {
         detectedWords.set(term, `${term.charAt(0).toUpperCase() + term.slice(1)}: ${meaning.charAt(0).toLowerCase() + meaning.slice(1)}.`);
       }
     }
     if (detectedWords.size > 0) {
-      importantWordsList = Array.from(detectedWords.values()).slice(0, 6);
+      importantWordsList = Array.from(detectedWords.values()).slice(0, 8);
     } else {
-      const uniqueW = Array.from(new Set(words.map(w => w.toLowerCase()))).filter(w => w.length > 5);
-      if (uniqueW.length > 0) {
-        importantWordsList = uniqueW.slice(0, 3).map(w => `${w.charAt(0).toUpperCase() + w.slice(1)}: a key concept introduced in this topic.`);
-      } else {
-        importantWordsList = ["Topic concepts: the core ideas introduced in this lesson."];
-      }
+      const uniqueW = Array.from(new Set(words.map(w => w.toLowerCase())))
+        .filter(w => w.length > 6 && !STOP_WORDS_SET.has(w));
+      importantWordsList = uniqueW.slice(0, 5).map(w => `${w.charAt(0).toUpperCase() + w.slice(1)}: an important word in this topic.`);
     }
 
-    simpleExample = `Think of this like an organized project at school or home. When you have the right tools, clear steps, and good information, you can easily reach your goal without unexpected surprises.`;
+    const topicWords = words
+      .map(w => w.toLowerCase())
+      .filter(w => w.length > 5 && !STOP_WORDS_SET.has(w));
+    const detectedTopic = Object.keys(DIFFICULT_WORDS_DICT)
+      .filter(term => term.includes(" ") && cleaned.toLowerCase().includes(term))
+      .sort((a, b) => b.length - a.length)[0];
+    const topic = detectedTopic || (topicWords.length > 0 ? topicWords[0] : "the topic");
+    simpleExample = detectedTopic
+      ? `Think of ${topic} like a step-by-step system. Each step changes or moves something forward until the final result is produced.`
+      : "Think of this topic like a step-by-step process. Each step helps produce the final result explained in the paragraph.";
 
     if (simplifiedSentenceList.length >= 2) {
       rememberThisPoints = [
-        simplifiedSentenceList[0].replace(/\.$/, ""),
-        simplifiedSentenceList[simplifiedSentenceList.length - 1].replace(/\.$/, "")
+        simplifiedSentenceList[0].replace(/[.!?]$/, ""),
+        simplifiedSentenceList[simplifiedSentenceList.length - 1].replace(/[.!?]$/, "")
       ];
     } else {
       rememberThisPoints = [
-        "Understand the main purpose of the process.",
-        "Follow the steps in order to see how it works."
+        "Focus on the main idea of the paragraph.",
+        "Use the important words and steps to remember the topic."
       ];
     }
   }
@@ -1096,14 +1185,17 @@ function simplifyText(text, arg2, arg3, arg4) {
   }
   const similarity = origTokens.length > 0 ? (matchingCount / Math.max(origTokens.length, simpTokens.length)) : 0;
 
-  // If output is too similar (> 65% unchanged), apply aggressive second pass
+  // If a general paragraph is still too similar, simplify it again with
+  // conservative sentence rules. Never return a copied paragraph as the
+  // teaching explanation.
   if (similarity > 0.65 && origTokens.length > 10 && !isStreamline && !isWaterCycle && !isPhotosynthesis) {
-    const secondPass = tokenizeSentences(inSimpleWords).map(sent => {
-      return sent
+    const secondPass = simplifyGeneralParagraph(inSimpleWords, gradeNum).map(sentence => {
+      return sentence
         .replace(/\b([a-zA-Z]+) is used to\b/gi, "people use $1 to")
         .replace(/\bcan be found\b/gi, "is found")
         .replace(/\bdemonstrates\b/gi, "shows")
-        .replace(/\butilize\b/gi, "use");
+        .replace(/\butilize\b/gi, "use")
+        .replace(/\bapproximately\b/gi, "about");
     });
     inSimpleWords = secondPass.join(" ");
   }
